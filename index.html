@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>คุณรู้จักคอมพิวเตอร์มากขนาดไหน</title>
+    <style>
+        * { box-sizing: border-box; font-family: sans-serif; margin: 0; padding: 0; }
+        body { background: #E0F2FE; min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 20px; }
+        .card { background: #FFFFFF; border-radius: 20px; padding: 25px; width: 100%; max-width: 500px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        h1 { color: #1E3A8A; font-size: 22px; margin-bottom: 15px; }
+        .author { background: #F0F9FF; border: 2px dashed #3B82F6; border-radius: 12px; padding: 12px; margin: 15px 0; text-align: left; font-size: 14px; color: #1E293B; line-height: 1.6; }
+        .btn { background: #2563EB; color: white; border: none; padding: 12px 24px; font-size: 16px; font-weight: bold; border-radius: 12px; cursor: pointer; width: 100%; margin-top: 10px; }
+        .btn:hover { background: #1D4ED8; }
+        .btn-next { background: #059669; display: none; }
+        .status { display: flex; justify-content: space-between; background: #DBEAFE; padding: 10px 15px; border-radius: 10px; margin-bottom: 15px; font-weight: bold; color: #1E40AF; }
+        .q-title { font-size: 17px; font-weight: bold; color: #0F172A; margin-bottom: 15px; text-align: left; }
+        .opt-btn { width: 100%; background: #F8FAFC; border: 2px solid #CBD5E1; padding: 10px 14px; border-radius: 10px; font-size: 15px; color: #334155; text-align: left; margin-bottom: 8px; cursor: pointer; }
+        .correct { background: #DCFCE7 !important; border-color: #16A34A !important; color: #14532D !important; font-weight: bold; }
+        .wrong { background: #FEE2E2 !important; border-color: #DC2626 !important; color: #7F1D1D !important; }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <!-- หน้าแรก -->
+        <div id="p-start">
+            <h1>🎮 คุณรู้จักคอมพิวเตอร์มากขนาดไหน</h1>
+            <div class="author">
+                <strong>👥 ผู้จัดทำโครงงาน (ห้อง ม.4/9):</strong><br>
+                1. นายวีรพงศ์ มูลผาลา เลขที่ 6<br>
+                2. นางสาวศิราณี เสนีโสด เลขที่ 7<br>
+                3. นางสาวโศธิดา สีทอง เลขที่ 8<br>
+                4. นายปารเมฆ ไชยสุวรรณ เลขที่ 20
+            </div>
+            <button class="btn" onclick="startQuiz()">เริ่มเล่นเกมเลย! 🚀</button>
+        </div>
+
+        <!-- หน้าเล่นเกม -->
+        <div id="p-quiz" style="display: none;">
+            <div class="status">
+                <div>ข้อที่: <span id="q-num">1/15</span></div>
+                <div>คะแนน: <span id="score">0</span></div>
+            </div>
+            <div id="q-text" class="q-title">...</div>
+            <div id="opt-list"></div>
+            <button id="b-next" class="btn btn-next" onclick="nextQuiz()">ข้อถัดไป ➡️</button>
+        </div>
+
+        <!-- หน้าสรุปผล -->
+        <div id="p-result" style="display: none;">
+            <h1 style="font-size: 40px;">🏆</h1>
+            <h1>จบการตอบคำถาม!</h1>
+            <div style="background: #F0F9FF; padding: 15px; border-radius: 12px; margin: 15px 0;">
+                <p style="color: #64748B;">คะแนนรวมของคุณ</p>
+                <p id="res-score" style="font-size: 36px; font-weight: bold; color: #2563EB;">0</p>
+                <p id="res-count" style="color: #1E40AF; font-weight: bold;">ตอบถูก 0 จาก 15 ข้อ</p>
+            </div>
+            <button class="btn" onclick="location.reload()">เล่นอีกครั้ง 🔄</button>
+        </div>
+    </div>
+
+    <script>
+        var data = [
+            { q: "1. อุปกรณ์ใดเปรียบเสมือน \"สมอง\" ของคอมพิวเตอร์?", o: ["ก. RAM", "ข. CPU", "ค. Hard Disk", "ง. GPU"], a: 1 },
+            { q: "2. หน่วยความจำชั่วคราว (RAM) มีหน้าที่สำคัญอย่างไร?", o: ["ก. เก็บข้อมูลถาวร", "ข. สำรองข้อมูล", "ค. เก็บข้อมูลชั่วคราวขณะเครื่องทำงาน", "ง. แสดงผลหน้าจอ"], a: 2 },
+            { q: "3. การ์ดจอ (GPU) ทำหน้าที่เน้นหนักในด้านใด?", o: ["ก. ประมวลผลภาพและกราฟิก", "ข. ประมวลผลเสียง", "ค. จ่ายไฟให้อุปกรณ์", "ง. จัดเก็บเอกสาร"], a: 0 },
+            { q: "4. เมนบอร์ด (Mainboard) คืออะไร?", o: ["ก. หน้าจอแสดงผล", "ข. แผงวงจรหลักเชื่อมต่ออุปกรณ์ทุกชิ้น", "ค. กล่องจ่ายไฟ", "ง. พัดลมระบายความร้อน"], a: 1 },
+            { q: "5. อุปกรณ์จัดเก็บข้อมูลประเภทใดมีความเร็วอ่าน-เขียนสูงที่สุด?", o: ["ก. Hard Disk Drive (HDD)", "ข. Flash Drive", "ค. SSD (Solid State Drive)", "ง. CD-ROM"], a: 2 },
+            { q: "6. Power Supply (PSU) ทำหน้าที่อย่างไร?", o: ["ก. สำรองไฟ", "ข. แปลงและจ่ายกระแสไฟฟ้า", "ค. ระบายความร้อน", "ง. เชื่อมต่อเน็ต"], a: 1 },
+            { q: "7. อุปกรณ์ใดเป็น \"หน่วยรับข้อมูล\" (Input Unit)?", o: ["ก. ลำโพง", "ข. เมาส์และคีย์บอร์ด", "ค. จอมอนิเตอร์", "ง. เครื่องพิมพ์"], a: 1 },
+            { q: "8. ระบบระบายความร้อนมีไว้เพื่ออุปกรณ์ใดเป็นหลัก?", o: ["ก. RAM", "ข. Power Supply", "ค. CPU", "ง. Hard Disk"], a: 2 },
+            { q: "9. พอร์ต USB ย่อมาจากคำว่าอะไร?", o: ["ก. Universal Serial Bus", "ข. Ultra System Bus", "ค. United Serial Box", "ง. Universal System Bus"], a: 0 },
+            { q: "10. เปิดคอมแล้วไม่มีภาพ แต่มีเสียง Beep ยาวถี่ๆ มักเกิดจากอะไร?", o: ["ก. เมาส์เสีย", "ข. คีย์บอร์ดหลุด", "ค. RAM หลวมหรือเสีย", "ง. ไม่มีกระดาษ"], a: 2 },
+            { q: "11. พอร์ต HDMI ใช้สำหรับเชื่อมต่ออุปกรณ์ใด?", o: ["ก. ลำโพง", "ข. จอมอนิเตอร์", "ค. ไมโครโฟน", "ง. สายแลน"], a: 1 },
+            { q: "12. ROM ต่างจาก RAM อย่างไร?", o: ["ก. ROM ข้อมูลไม่หายเมื่อปิดเครื่อง", "ข. ROM เร็วกว่า RAM", "ค. ROM เป็นชั่วคราว", "ง. ROM ทำงานกราฟิก"], a: 0 },
+            { q: "13. เคส (Computer Case) มีประโยชน์หลักอย่างไร?", o: ["ก. เพิ่มความเร็ว", "ข. ป้องกันอันตรายให้อุปกรณ์ภายใน", "ค. ประหยัดไฟ", "ง. เพิ่มความชัดภาพ"], a: 1 },
+            { q: "14. Sound Card ทำหน้าที่เกี่ยวกับอะไร?", o: ["ก. แสดงภาพ 3D", "ข. ประมวลผลสัญญาณเสียง", "ค. เชื่อมต่อ Wi-Fi", "ง. เพิ่มความจำ"], a: 1 },
+            { q: "15. ต้องการให้เปิดเครื่องและโปรแกรมไวขึ้น ควรเปลี่ยนใช้สิ่งใด?", o: ["ก. เปลี่ยนเคส", "ข. เพิ่มพัดลม", "ค. เปลี่ยนใช้ SSD", "ง. เปลี่ยนสายไฟ"], a: 2 }
+        ];
+
+        var idx = 0, score = 0, correct = 0;
+
+        function startQuiz() {
+            document.getElementById("p-start").style.display = "none";
+            document.getElementById("p-quiz").style.display = "block";
+            loadQ();
+        }
+
+        function loadQ() {
+            document.getElementById("b-next").style.display = "none";
+            var item = data[idx];
+            document.getElementById("q-num").innerText = (idx + 1) + "/15";
+            document.getElementById("score").innerText = score;
+            document.getElementById("q-text").innerText = item.q;
+
+            var list = document.getElementById("opt-list");
+            list.innerHTML = "";
+
+            for (var i = 0; i < item.o.length; i++) {
+                var btn = document.createElement("button");
+                btn.className = "opt-btn";
+                btn.innerText = item.o[i];
+                btn.onclick = (function(choice) {
+                    return function() { checkQ(choice); };
+                })(i);
+                list.appendChild(btn);
+            }
+        }
+
+        function checkQ(choice) {
+            var item = data[idx];
+            var btns = document.getElementsByClassName("opt-btn");
+
+            for (var i = 0; i < btns.length; i++) { btns[i].disabled = true; }
+
+            if (choice === item.a) {
+                score += 100;
+                correct++;
+                btns[choice].className = "opt-btn correct";
+            } else {
+                btns[choice].className = "opt-btn wrong";
+                btns[item.a].className = "opt-btn correct";
+            }
+
+            document.getElementById("b-next").style.display = "block";
+        }
+
+        function nextQuiz() {
+            idx++;
+            if (idx < data.length) {
+                loadQ();
+            } else {
+                document.getElementById("p-quiz").style.display = "none";
+                document.getElementById("p-result").style.display = "block";
+                document.getElementById("res-score").innerText = score;
+                document.getElementById("res-count").innerText = "ตอบถูก " + correct + " จาก 15 ข้อ";
+            }
+        }
+    </script>
+</body>
+</html>
